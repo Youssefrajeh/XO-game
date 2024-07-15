@@ -68,8 +68,9 @@
       }
       .myName {
         color: red;
-        position: relative;
+        position: absolute;
         z-index: 1001;
+        cursor: grab;
       }
       .myName:hover {
         color: blue;
@@ -83,8 +84,8 @@
         transform: translate(-50%, -50%);
         z-index: 999;
         opacity: 0.5;
+        cursor: grab;
       }
-
       .modal {
         display: none;
         position: fixed;
@@ -123,14 +124,14 @@
       .modal-content button:hover {
         background-color: #005f6a;
       }
-
       .text-box {
         font-size: 25px;
         font-family: sans-serif;
         position: absolute;
-        top: 15%;
+        top: 20%;
         left: 50%;
         transform: translate(-50%, -50%);
+        cursor: grab;
       }
       .text-box span {
         animation: mover 6s linear infinite;
@@ -178,11 +179,12 @@
         position: absolute;
         top: 50px;
         right: 200px;
+        cursor: grab;
       }
     </style>
   </head>
   <body>
-    <div class="text-box">
+    <div class="text-box" id="draggable-name" draggable="true">
       <span>Y</span>
       <span>O</span>
       <span>U</span>
@@ -190,12 +192,6 @@
       <span>S</span>
       <span>E</span>
       <span>F</span>
-      <div class="image-main">
-        <img
-          src="images/Animated-Businessman-Transparent-Background.png"
-          alt=""
-        />
-      </div>
     </div>
 
     <h2 id="current-player">--- Current Player ---- : X</h2>
@@ -237,6 +233,15 @@
         <p id="winMessage"></p>
         <button onclick="closeModal()">OK</button>
       </div>
+    </div>
+
+    <div class="image-main">
+      <img
+        src="images/Animated-Businessman-Transparent-Background.png"
+        alt=""
+        id="draggable-image"
+        draggable="true"
+      />
     </div>
 
     <script>
@@ -327,6 +332,33 @@
       boardHeightInput.addEventListener("input", updateBoardSize);
 
       updateBoardSize();
+
+    
+      document.addEventListener("dragstart", (event) => {
+        if (
+          event.target.id === "draggable-name" ||
+          event.target.id === "draggable-image"
+        ) {
+          event.dataTransfer.setData("text/plain", event.target.id);
+        }
+      });
+
+      document.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+
+      document.addEventListener("drop", (event) => {
+        event.preventDefault();
+        const id = event.dataTransfer.getData("text");
+        const draggableElement = document.getElementById(id);
+        draggableElement.style.position = "absolute";
+        draggableElement.style.left = `${
+          event.clientX - draggableElement.offsetWidth / 2
+        }px`;
+        draggableElement.style.top = `${
+          event.clientY - draggableElement.offsetHeight / 2
+        }px`;
+      });
     </script>
   </body>
 </html>
