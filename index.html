@@ -333,32 +333,58 @@
 
       updateBoardSize();
 
-    
-      document.addEventListener("dragstart", (event) => {
+      // Drag and Drop Functionality
+      let draggableElement = null;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      function onDragStart(event) {
+        draggableElement = event.target;
         if (
-          event.target.id === "draggable-name" ||
-          event.target.id === "draggable-image"
+          draggableElement.classList.contains("text-box") ||
+          draggableElement.id === "draggable-image"
         ) {
-          event.dataTransfer.setData("text/plain", event.target.id);
+          const rect = draggableElement.getBoundingClientRect();
+          offsetX = event.clientX - rect.left;
+          offsetY = event.clientY - rect.top;
+          if (event.type === "touchstart") {
+            offsetX = event.touches[0].clientX - rect.left;
+            offsetY = event.touches[0].clientY - rect.top;
+          }
+        } else {
+          draggableElement = null;
         }
-      });
+      }
 
-      document.addEventListener("dragover", (event) => {
-        event.preventDefault();
-      });
+      function onDrag(event) {
+        if (!draggableElement) return;
+        if (event.type === "mousemove") {
+          draggableElement.style.left = `${event.clientX - offsetX}px`;
+          draggableElement.style.top = `${event.clientY - offsetY}px`;
+        } else if (event.type === "touchmove") {
+          draggableElement.style.left = `${
+            event.touches[0].clientX - offsetX
+          }px`;
+          draggableElement.style.top = `${
+            event.touches[0].clientY - offsetY
+          }px`;
+        }
+      }
 
-      document.addEventListener("drop", (event) => {
-        event.preventDefault();
-        const id = event.dataTransfer.getData("text");
-        const draggableElement = document.getElementById(id);
-        draggableElement.style.position = "absolute";
-        draggableElement.style.left = `${
-          event.clientX - draggableElement.offsetWidth / 2
-        }px`;
-        draggableElement.style.top = `${
-          event.clientY - draggableElement.offsetHeight / 2
-        }px`;
-      });
+      function onDragEnd() {
+        draggableElement = null;
+      }
+
+      document.addEventListener("mousedown", onDragStart);
+      document.addEventListener("mousemove", onDrag);
+      document.addEventListener("mouseup", onDragEnd);
+      document.addEventListener("touchstart", onDragStart);
+      document.addEventListener("touchmove", onDrag);
+      document.addEventListener("touchend", onDragEnd);
+
+      // Make the text-box and image draggable
+      document.getElementById("draggable-name").style.position = "absolute";
+      document.getElementById("draggable-image").style.position = "absolute";
     </script>
   </body>
 </html>
